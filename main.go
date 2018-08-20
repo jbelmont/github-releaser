@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 var (
@@ -18,6 +20,46 @@ var (
 	repo            = flag.String("repo", "", "Enter your github repository")
 	accessToken     = flag.String("accessToken", "", "Enter your Github Access Token")
 )
+
+type Release struct {
+	URL             string    `json:"url"`
+	HTMLURL         string    `json:"html_url"`
+	AssetsURL       string    `json:"assets_url"`
+	UploadURL       string    `json:"upload_url"`
+	TarballURL      string    `json:"tarball_url"`
+	ZipballURL      string    `json:"zipball_url"`
+	ID              int       `json:"id"`
+	NodeID          string    `json:"node_id"`
+	TagName         string    `json:"tag_name"`
+	TargetCommitish string    `json:"target_commitish"`
+	Name            string    `json:"name"`
+	Body            string    `json:"body"`
+	Draft           bool      `json:"draft"`
+	Prerelease      bool      `json:"prerelease"`
+	CreatedAt       time.Time `json:"created_at"`
+	PublishedAt     time.Time `json:"published_at"`
+	Author          struct {
+		Login             string `json:"login"`
+		ID                int    `json:"id"`
+		NodeID            string `json:"node_id"`
+		AvatarURL         string `json:"avatar_url"`
+		GravatarID        string `json:"gravatar_id"`
+		URL               string `json:"url"`
+		HTMLURL           string `json:"html_url"`
+		FollowersURL      string `json:"followers_url"`
+		FollowingURL      string `json:"following_url"`
+		GistsURL          string `json:"gists_url"`
+		StarredURL        string `json:"starred_url"`
+		SubscriptionsURL  string `json:"subscriptions_url"`
+		OrganizationsURL  string `json:"organizations_url"`
+		ReposURL          string `json:"repos_url"`
+		EventsURL         string `json:"events_url"`
+		ReceivedEventsURL string `json:"received_events_url"`
+		Type              string `json:"type"`
+		SiteAdmin         bool   `json:"site_admin"`
+	} `json:"author"`
+	Assets []interface{} `json:"assets"`
+}
 
 func checkArgs() {
 	if *tagName == "" {
@@ -97,9 +139,14 @@ func main() {
 		log.Fatalln("Should receive a status code of 201 created")
 	}
 
-	var result map[string]interface{}
+	release := new(Release)
 
-	json.NewDecoder(resp.Body).Decode(&result)
+	json.NewDecoder(resp.Body).Decode(&release)
 
-	log.Println(result)
+	json, err := json.MarshalIndent(release, "", "    ")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(json))
 }

@@ -53,3 +53,7 @@ You can run the following command to grab the commit on the top of your Git Log 
 ```bash
 git log --pretty=oneline | head -1 | awk '{print $1}' | pbcopy
 ```
+
+#### Here is what the Github Release will look like
+
+![Github Release](images/release_screenshot.png)
