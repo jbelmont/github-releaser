@@ -16,6 +16,7 @@ var (
 	body            = flag.String("body", "", "Provide a description of the release")
 	username        = flag.String("username", "", "Enter your github username/organization")
 	repo            = flag.String("repo", "", "Enter your github repository")
+	accessToken     = flag.String("accessToken", "", "Enter your Github Access Token")
 )
 
 func checkArgs() {
@@ -40,6 +41,10 @@ func checkArgs() {
 		os.Exit(2)
 	}
 	if *repo == "" {
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
+	if *accessToken == "" {
 		flag.PrintDefaults()
 		os.Exit(2)
 	}
@@ -79,7 +84,7 @@ func main() {
 		bytes.NewBuffer(postBody),
 	)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "token "+os.Getenv("PACKTCI_PERSONAL_TOKEN"))
+	req.Header.Set("Authorization", "token "+*accessToken)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -97,5 +102,4 @@ func main() {
 	json.NewDecoder(resp.Body).Decode(&result)
 
 	log.Println(result)
-	log.Println(result["url"])
 }
